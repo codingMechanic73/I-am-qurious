@@ -36,7 +36,8 @@ public class TopicEntity implements Serializable {
     private Set<PostEntity> posts;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private UserEntity createdBy;
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    private UserEntity user;
 
     private String topicPicture;
 

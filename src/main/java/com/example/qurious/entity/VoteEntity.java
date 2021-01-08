@@ -25,7 +25,7 @@ public class VoteEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
-    private UserEntity votedBy;
+    private UserEntity user;
 
     @ManyToOne
     @JoinColumn(name = "post_id", referencedColumnName = "postId")

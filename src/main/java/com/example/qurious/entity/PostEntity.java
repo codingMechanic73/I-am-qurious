@@ -40,7 +40,7 @@ public class PostEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "userId")
-    private UserEntity postedBy;
+    private UserEntity user;
 
     private Instant postedOn;
 

@@ -32,10 +32,11 @@ public class UserEntity implements Serializable {
     private boolean isVerified;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private UserDetailsEntity userDetails;
 
     @ManyToOne()
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role_id", referencedColumnName = "roleId")
     private RoleEntity role;
 
 }

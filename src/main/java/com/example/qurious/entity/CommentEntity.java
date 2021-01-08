@@ -30,11 +30,11 @@ public class CommentEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", referencedColumnName = "postId")
-    private PostEntity postEntity;
+    private PostEntity post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
-    private UserEntity commentedBy;
+    private UserEntity user;
 
     private Instant commentedOn;
 
