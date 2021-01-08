@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.Instant;
 
 @Data
@@ -16,17 +16,17 @@ import java.time.Instant;
 @NoArgsConstructor
 @Entity
 @Table(name = "USER_DETAILS")
-public class UserDetailsEntity {
+public class UserDetailsEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userDetailsId;
 
     @NotBlank(message = "email is required")
     @Email(message = "Provided invalid email")
     private String email;
 
-    private Instant createdAt;
+    private Instant createdOn;
 
     private String profileUrl;
 

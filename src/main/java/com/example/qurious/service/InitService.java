@@ -7,6 +7,7 @@ import com.example.qurious.repository.RoleRepository;
 import com.example.qurious.repository.UserRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -24,6 +25,7 @@ import java.time.Instant;
 public class InitService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${admin.email}")
     private String adminEmail;
@@ -44,12 +46,12 @@ public class InitService {
     public void addRoles() {
 
         RoleEntity adminRole = new RoleEntity();
-        adminRole.setId(1L);
+        adminRole.setRoleId(1L);
         adminRole.setRoleType("ADMIN");
         roleRepository.save(adminRole);
 
         RoleEntity userRole = new RoleEntity();
-        userRole.setId(2L);
+        userRole.setRoleId(2L);
         userRole.setRoleType("USER");
         roleRepository.save(userRole);
     }
@@ -57,14 +59,14 @@ public class InitService {
     public void addAdmin() {
         UserEntity admin = new UserEntity();
         admin.setUserName("admin");
-        admin.setPassword(adminPassword);
+        admin.setPassword(passwordEncoder.encode(adminPassword));
         admin.setRole(roleRepository.getOne(1L));
         admin.setVerified(true);
 
 
         UserDetailsEntity userDetails = new UserDetailsEntity();
         userDetails.setEmail(adminEmail);
-        userDetails.setCreatedAt(Instant.now());
+        userDetails.setCreatedOn(Instant.now());
         userDetails.setProfileUrl("");
         admin.setUserDetails(userDetails);
         userRepository.save(admin);

@@ -26,7 +26,7 @@ public class EntityDtoMapper {
         UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setEmail(signUpRequestDto.getEmail());
         userDetailsEntity.setProfileUrl(signUpRequestDto.getProfileUrl());
-        userDetailsEntity.setCreatedAt(Instant.now());
+        userDetailsEntity.setCreatedOn(Instant.now());
 
         RoleEntity role = roleRepository.getOne(2L);
 
