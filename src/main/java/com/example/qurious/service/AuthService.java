@@ -4,6 +4,7 @@ import com.example.qurious.dto.SignInRequestDto;
 import com.example.qurious.dto.SignInResponseDto;
 import com.example.qurious.dto.SignUpRequestDto;
 import com.example.qurious.entity.UserEntity;
+import com.example.qurious.exception.CriticalException;
 import com.example.qurious.exception.UserAlreadyExistsException;
 import com.example.qurious.exception.UserNameAlreadyExistsException;
 import com.example.qurious.repository.UserDetailsRepository;
@@ -11,6 +12,8 @@ import com.example.qurious.repository.UserRepository;
 import com.example.qurious.security.JwtProvider;
 import com.example.qurious.util.EntityDtoMapper;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,18 +28,25 @@ import org.springframework.transaction.annotation.Transactional;
  * Class that provides authentication related service
  */
 @Data
-@Transactional
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
     private final UserDetailsRepository userDetailsRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtProvider jwtProvider;
-    private final AuthenticationManager authenticationManager;
     private final MyUserServiceDetails userServiceDetails;
-    private final EntityDtoMapper entityDtoMapper;
 
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
+
+//    As EntityDtoMapper is used in the authService and
+//    AuthService is used in EntityDtoMapper it created circular
+//    dependency and hence constructor injection is not possible.
+//    EntityDtoMapper is injected using field injection and lazily initialized
+
+    @Autowired
+    @Lazy
+    private EntityDtoMapper entityDtoMapper;
 
     /**
      * Sign the user in
@@ -44,6 +54,7 @@ public class AuthService {
      * @param signInRequestDto credentials from user
      * @return user details with valid jwt token
      */
+    @Transactional
     public SignInResponseDto signIn(SignInRequestDto signInRequestDto) {
         Authentication authenticatedUser = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(signInRequestDto.getUserName(),
@@ -68,9 +79,13 @@ public class AuthService {
      * @param signUpRequestDto details to create a new user
      * @throws UserAlreadyExistsException     if the user already exist
      * @throws UserNameAlreadyExistsException if the userName is already in use
+     * @throws CriticalException              Internal server error
      */
+    @Transactional
     public void signUp(SignUpRequestDto signUpRequestDto) throws
-            UserNameAlreadyExistsException, UserAlreadyExistsException {
+            UserNameAlreadyExistsException,
+            UserAlreadyExistsException,
+            CriticalException {
         if (checkUserNameExists(signUpRequestDto.getUserName())) {
             throw new UserNameAlreadyExistsException(signUpRequestDto.getUserName());
         }
@@ -79,7 +94,7 @@ public class AuthService {
             throw new UserAlreadyExistsException(signUpRequestDto.getEmail());
         }
 
-        UserEntity user = entityDtoMapper.SignUpRequestDtoToUserEntity(signUpRequestDto);
+        UserEntity user = entityDtoMapper.signUpRequestDtoToUserEntity(signUpRequestDto);
         user.setPassword(passwordEncoder.encode(signUpRequestDto.getPassword()));
         userRepository.save(user);
     }
@@ -92,17 +107,22 @@ public class AuthService {
     @Transactional(readOnly = true)
     public UserEntity getCurrentUser() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUserName(userName).orElseThrow(() -> new UsernameNotFoundException(userName));
+        return userRepository
+                .findByUserName(userName)
+                .orElseThrow(() -> new UsernameNotFoundException(userName));
     }
 
     /**
      * Checks if the userName exists
      *
-     * @param userName userName
+     * @param userName user input
      * @return true or false depending if the user exists or not
      */
+    @Transactional(readOnly = true)
     public boolean checkUserNameExists(String userName) {
-        return userRepository.findByUserName(userName).isPresent();
+        return userRepository
+                .findByUserName(userName)
+                .isPresent();
     }
 
     /**
@@ -111,8 +131,11 @@ public class AuthService {
      * @param email email of the user
      * @return true or false depending if the email exists or not
      */
+    @Transactional(readOnly = true)
     public boolean checkEmailExists(String email) {
-        return userDetailsRepository.findByEmail(email).isPresent();
+        return userDetailsRepository
+                .findByEmail(email)
+                .isPresent();
     }
 
 }

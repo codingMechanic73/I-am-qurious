@@ -23,18 +23,18 @@ import java.time.Instant;
 @Data
 @Service
 public class InitService {
+
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     @Value("${admin.email}")
     private String adminEmail;
-
     @Value("${admin.password}")
     private String adminPassword;
 
     private final String uploadDir = "storage/assets/";
-
 
     @PostConstruct
     public void initData() throws IOException {
@@ -44,7 +44,6 @@ public class InitService {
     }
 
     public void addRoles() {
-
         RoleEntity adminRole = new RoleEntity();
         adminRole.setRoleId(1L);
         adminRole.setRoleType("ADMIN");
@@ -63,14 +62,13 @@ public class InitService {
         admin.setRole(roleRepository.getOne(1L));
         admin.setVerified(true);
 
-
         UserDetailsEntity userDetails = new UserDetailsEntity();
         userDetails.setEmail(adminEmail);
+        userDetails.setFirstName("alan");
         userDetails.setCreatedOn(Instant.now());
         userDetails.setProfileUrl("");
         admin.setUserDetails(userDetails);
         userRepository.save(admin);
-
     }
 
     public void createFolders(String folder) throws IOException {

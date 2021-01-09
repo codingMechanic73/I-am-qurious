@@ -26,6 +26,11 @@ public class UserDetailsEntity implements Serializable {
     @Email(message = "Provided invalid email")
     private String email;
 
+    @NotBlank(message = "first name is required")
+    private String firstName;
+
+    private String lastName;
+
     private Instant createdOn;
 
     private String profileUrl;

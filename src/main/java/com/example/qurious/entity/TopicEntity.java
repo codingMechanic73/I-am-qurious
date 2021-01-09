@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -33,7 +33,7 @@ public class TopicEntity implements Serializable {
     private String description;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "topic")
-    private Set<PostEntity> posts;
+    private List<PostEntity> posts;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "userId")

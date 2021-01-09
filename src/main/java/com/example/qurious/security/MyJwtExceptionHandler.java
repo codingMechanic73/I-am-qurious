@@ -28,4 +28,5 @@ public class MyJwtExceptionHandler implements AuthenticationEntryPoint {
                          AuthenticationException e) throws IOException {
         httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED");
     }
+
 }

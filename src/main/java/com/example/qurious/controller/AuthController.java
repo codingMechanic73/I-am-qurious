@@ -1,6 +1,7 @@
 package com.example.qurious.controller;
 
 import com.example.qurious.dto.*;
+import com.example.qurious.exception.CriticalException;
 import com.example.qurious.exception.UserAlreadyExistsException;
 import com.example.qurious.exception.UserNameAlreadyExistsException;
 import com.example.qurious.exception.UserNotFoundException;
@@ -30,11 +31,9 @@ public class AuthController {
      *
      * @param signInRequestDto credentials from user
      * @return user details with valid jwt token
-     * @throws UserNotFoundException if the user doesn't exist
      */
     @PostMapping(value = "signin")
-    public ResponseEntity<SignInResponseDto> signIn(@RequestBody SignInRequestDto signInRequestDto) throws
-            UserNotFoundException {
+    public ResponseEntity<SignInResponseDto> signIn(@RequestBody SignInRequestDto signInRequestDto) {
         SignInResponseDto signInResponseDto = authService.signIn(signInRequestDto);
         return ResponseEntity
                 .ok()
@@ -46,13 +45,14 @@ public class AuthController {
      *
      * @param signUpRequestDto details to create a new user
      * @return success response stating user created
-     * @throws UserAlreadyExistsException if the user already exist
+     * @throws UserAlreadyExistsException     if the user already exist
      * @throws UserNameAlreadyExistsException if the userName is already in use
+     * @throws CriticalException              Internal server error
      */
     @PostMapping(value = "/signup")
     public ResponseEntity<CustomResponseDto> signUp(@RequestBody SignUpRequestDto signUpRequestDto)
             throws UserNameAlreadyExistsException,
-            UserAlreadyExistsException {
+            UserAlreadyExistsException, CriticalException {
         authService.signUp(signUpRequestDto);
         CustomResponseDto customResponseDto = CustomResponseDto.builder()
                 .message("Signed Up Successfully")
@@ -66,6 +66,7 @@ public class AuthController {
 
     /**
      * Checks if the userName is in user
+     *
      * @param userNameDto entered userName
      * @return if userName is available or not
      * @throws UserNameAlreadyExistsException if user already exists
