@@ -33,13 +33,13 @@ public class TopicService {
      * @throws TopicAlreadyExistsException exception stating topic user wants to create already exist
      */
     @Transactional
-    public TopicEntity save(TopicRequestDto topicRequestDto) throws TopicAlreadyExistsException {
+    public TopicResponseDto save(TopicRequestDto topicRequestDto) throws TopicAlreadyExistsException {
         if (checkIfTopicExists(topicRequestDto.getTopicName())) {
             throw new TopicAlreadyExistsException(topicRequestDto.getTopicName());
         } else {
             TopicEntity topicEntity = entityDtoMapper.topicRequestDtoToTopicEntity(topicRequestDto);
             topicRepository.save(topicEntity);
-            return topicEntity;
+            return entityDtoMapper.topicEntityToTopicResponseDto(topicEntity);
         }
     }
 

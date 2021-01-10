@@ -5,8 +5,8 @@ import java.util.Arrays;
 
 public enum VoteTypeEnum {
 
-    UP_VOTE(1),
-    DOWN_VOTE(-1);
+    LIKED(1),
+    DISLIKED(-1);
 
     int direction;
 

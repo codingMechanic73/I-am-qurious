@@ -6,12 +6,12 @@ import com.example.qurious.entity.PostEntity;
 import com.example.qurious.entity.TopicEntity;
 import com.example.qurious.entity.UserEntity;
 import com.example.qurious.exception.TopicNotFoundException;
+import com.example.qurious.exception.UserNotFoundException;
 import com.example.qurious.repository.PostRepository;
 import com.example.qurious.repository.TopicRepository;
 import com.example.qurious.repository.UserRepository;
 import com.example.qurious.util.EntityDtoMapper;
 import lombok.Data;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,10 +39,10 @@ public class PostService {
      * @throws TopicNotFoundException topic related to post not found
      */
     @Transactional
-    public PostEntity save(PostRequestDto postRequestDto) throws TopicNotFoundException {
+    public PostResponseDto save(PostRequestDto postRequestDto) throws TopicNotFoundException {
         PostEntity postEntity = entityDtoMapper.postRequestDtoToPostEntity(postRequestDto);
         postRepository.save(postEntity);
-        return postEntity;
+        return entityDtoMapper.postEntityToPostResponseDto(postEntity);
     }
 
     /**
@@ -72,10 +72,10 @@ public class PostService {
      * @return All posts with the given userName
      */
     @Transactional(readOnly = true)
-    public List<PostResponseDto> getPostByUserName(String userName) {
+    public List<PostResponseDto> getPostByUserName(String userName) throws UserNotFoundException {
         UserEntity user = userRepository
                 .findByUserName(userName)
-                .orElseThrow(() -> new UsernameNotFoundException(userName));
+                .orElseThrow(() -> new UserNotFoundException(userName));
         return postRepository
                 .findByUser(user)
                 .stream()

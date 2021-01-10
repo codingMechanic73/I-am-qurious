@@ -36,7 +36,8 @@ public class PostEntity implements Serializable {
     @JoinColumn(name = "topic_id")
     private TopicEntity topic;
 
-    private Integer voteCount;
+    private Integer likeCount;
+    private Integer dislikeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "userId")

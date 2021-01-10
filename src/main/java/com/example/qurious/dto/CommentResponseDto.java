@@ -3,6 +3,8 @@ package com.example.qurious.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
+
 @Data
 @Builder
 public class CommentResponseDto {
@@ -11,7 +13,7 @@ public class CommentResponseDto {
     private String comment;
     private Long postId;
     private String postName;
-    private String commentedTimeAgo;
+    private Instant commentedOn;
     private String commentedBy;
 
 }

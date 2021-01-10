@@ -3,6 +3,7 @@ package com.example.qurious.aspect;
 import com.example.qurious.dto.CustomResponseDto;
 import com.example.qurious.exception.UserAlreadyExistsException;
 import com.example.qurious.exception.UserNameAlreadyExistsException;
+import com.example.qurious.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,6 +50,23 @@ public class UserExceptionAspect {
                 .statusCode(HttpStatus.CONFLICT.value())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * This is an exception handling if userName is not found
+     *
+     * @param exception returned by the controller
+     * @return response stating user not found
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<CustomResponseDto> handleUserNotFoundException(Exception exception) {
+        CustomResponseDto response = CustomResponseDto
+                .builder()
+                .message(exception.getMessage())
+                .timestamp(Instant.now())
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
 }

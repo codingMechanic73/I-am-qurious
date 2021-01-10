@@ -3,6 +3,8 @@ package com.example.qurious.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
+
 @Data
 @Builder
 public class PostResponseDto {
@@ -13,10 +15,11 @@ public class PostResponseDto {
     private String postTitle;
     private String postDescription;
     private String postedBy;
-    private String postedTimeAgo;
+    private Instant postedOn;
     private Integer commentCount;
-    private Integer voteCount;
-    private boolean isUpVoted;
-    private boolean isDownVoted;
+    private Integer likeCount;
+    private Integer dislikeCount;
+    private boolean isLiked;
+    private boolean isDisliked;
 
 }

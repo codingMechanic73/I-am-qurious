@@ -84,13 +84,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Time ago library -->
-        <dependency>
-            <groupId>com.github.marlonlom</groupId>
-            <artifactId>timeago</artifactId>
-            <version>4.0.1</version>
-        </dependency>
-
         <!--Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -8,7 +8,6 @@ import com.example.qurious.exception.PostNotFoundException;
 import com.example.qurious.exception.TopicNotFoundException;
 import com.example.qurious.repository.*;
 import com.example.qurious.service.AuthService;
-import com.github.marlonlom.utilities.timeago.TimeAgo;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -73,7 +72,7 @@ public class EntityDtoMapper {
                 .noOfPosts(topicEntity.getPosts().size())
                 .createdBy(topicEntity.getUser().getUserName())
                 .topicPicture(topicEntity.getTopicPicture())
-                .createdTimeAgo(TimeAgo.using(topicEntity.getCreatedOn().toEpochMilli()))
+                .createdOn(topicEntity.getCreatedOn())
                 .build();
     }
 
@@ -82,7 +81,8 @@ public class EntityDtoMapper {
         PostEntity postEntity = new PostEntity();
         postEntity.setTitle(postRequestDto.getPostTitle());
         postEntity.setDescription(postRequestDto.getPostDescription());
-        postEntity.setVoteCount(0);
+        postEntity.setLikeCount(0);
+        postEntity.setDislikeCount(0);
         postEntity.setPostedOn(Instant.now());
         TopicEntity topicEntity = topicRepository
                 .findById(postRequestDto
@@ -101,11 +101,12 @@ public class EntityDtoMapper {
                 .topicId(postEntity.getTopic().getTopicId())
                 .topicName(postEntity.getTopic().getTopicName())
                 .postedBy(postEntity.getUser().getUserName())
-                .postedTimeAgo(TimeAgo.using(postEntity.getPostedOn().toEpochMilli()))
+                .postedOn(postEntity.getPostedOn())
                 .commentCount(commentRepository.findByPost(postEntity).size())
-                .isUpVoted(checkVoteType(postEntity, authService.getCurrentUser(), VoteTypeEnum.UP_VOTE))
-                .isDownVoted(checkVoteType(postEntity, authService.getCurrentUser(), VoteTypeEnum.DOWN_VOTE))
-                .voteCount(postEntity.getVoteCount())
+                .isLiked(checkVoteType(postEntity, authService.getCurrentUser(), VoteTypeEnum.LIKED))
+                .isDisliked(checkVoteType(postEntity, authService.getCurrentUser(), VoteTypeEnum.DISLIKED))
+                .likeCount(postEntity.getLikeCount())
+                .dislikeCount(postEntity.getDislikeCount())
                 .build();
     }
 
@@ -137,7 +138,7 @@ public class EntityDtoMapper {
                 .postId(commentEntity.getPost().getPostId())
                 .commentedBy(commentEntity.getUser().getUserName())
                 .postName(commentEntity.getPost().getTitle())
-                .commentedTimeAgo(TimeAgo.using(commentEntity.getCommentedOn().toEpochMilli()))
+                .commentedOn(commentEntity.getCommentedOn())
                 .commentedBy(commentEntity.getUser().getUserName())
                 .build();
     }

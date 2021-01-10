@@ -6,6 +6,7 @@ import com.example.qurious.entity.CommentEntity;
 import com.example.qurious.entity.PostEntity;
 import com.example.qurious.entity.UserEntity;
 import com.example.qurious.exception.PostNotFoundException;
+import com.example.qurious.exception.UserNotFoundException;
 import com.example.qurious.repository.CommentRepository;
 import com.example.qurious.repository.PostRepository;
 import com.example.qurious.repository.UserRepository;
@@ -39,11 +40,11 @@ public class CommentService {
      * @throws PostNotFoundException post related to comment not found
      */
     @Transactional
-    public CommentEntity save(CommentRequestDto commentRequestDto) throws
+    public CommentResponseDto save(CommentRequestDto commentRequestDto) throws
             PostNotFoundException {
         CommentEntity commentEntity = entityDtoMapper.commentRequestDtoToCommentEntity(commentRequestDto);
         commentRepository.save(commentEntity);
-        return commentEntity;
+        return entityDtoMapper.commentEntityToPostResponseDto(commentEntity);
     }
 
     /**
@@ -69,8 +70,8 @@ public class CommentService {
      * @throws UsernameNotFoundException user related to userName not found
      */
     @Transactional(readOnly = true)
-    public List<CommentResponseDto> getCommentsForUser(String userName) {
-        UserEntity user = userRepository.findByUserName(userName).orElseThrow(() -> new UsernameNotFoundException(userName));
+    public List<CommentResponseDto> getCommentsForUser(String userName) throws UserNotFoundException {
+        UserEntity user = userRepository.findByUserName(userName).orElseThrow(() -> new UserNotFoundException(userName));
         return commentRepository.findAllByUser(user)
                 .stream()
                 .map(entityDtoMapper::commentEntityToPostResponseDto)

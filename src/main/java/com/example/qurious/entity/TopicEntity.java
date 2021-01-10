@@ -3,6 +3,7 @@ package com.example.qurious.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -32,6 +33,7 @@ public class TopicEntity implements Serializable {
     @Size(max = 250, message = "Max of 250 characters allowed for description")
     private String description;
 
+    @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "topic")
     private List<PostEntity> posts;
 

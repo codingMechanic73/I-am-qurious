@@ -4,7 +4,6 @@ import com.example.qurious.dto.*;
 import com.example.qurious.exception.CriticalException;
 import com.example.qurious.exception.UserAlreadyExistsException;
 import com.example.qurious.exception.UserNameAlreadyExistsException;
-import com.example.qurious.exception.UserNotFoundException;
 import com.example.qurious.service.AuthService;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
@@ -36,7 +35,7 @@ public class AuthController {
     public ResponseEntity<SignInResponseDto> signIn(@RequestBody SignInRequestDto signInRequestDto) {
         SignInResponseDto signInResponseDto = authService.signIn(signInRequestDto);
         return ResponseEntity
-                .ok()
+                .status(HttpStatus.OK)
                 .body(signInResponseDto);
     }
 
@@ -60,7 +59,7 @@ public class AuthController {
                 .statusCode(HttpStatus.OK.value())
                 .build();
         return ResponseEntity
-                .ok()
+                .status(HttpStatus.CREATED)
                 .body(customResponseDto);
     }
 
@@ -85,7 +84,7 @@ public class AuthController {
                 .build();
 
         return ResponseEntity
-                .ok()
+                .status(HttpStatus.OK)
                 .body(customResponseDto);
     }
 

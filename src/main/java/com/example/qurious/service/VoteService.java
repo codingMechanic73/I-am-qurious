@@ -38,26 +38,39 @@ public class VoteService {
      * @throws AlreadyVotedException exception stating user has already voted
      */
     public VoteEntity save(VoteRequestDto voteRequestDto) throws PostNotFoundException, AlreadyVotedException {
+        UserEntity user = authService.getCurrentUser();
 
         PostEntity postEntity = postRepository.findById(voteRequestDto.getPostId())
                 .orElseThrow(() -> new PostNotFoundException(voteRequestDto.getPostId().toString()));
 
-        UserEntity user = authService.getCurrentUser();
         Optional<VoteEntity> previousVote = voteRepository.findTopByPostAndUser(postEntity, user);
-        if (previousVote.isPresent()
-                && previousVote.get().getVoteType().equals(voteRequestDto.getVoteType())) {
-            throw new AlreadyVotedException(voteRequestDto.getVoteType().name());
-        } else {
-            VoteEntity voteEntity = entityDtoMapper.voteRequestDtoToVoteEntity(voteRequestDto);
-            if (voteRequestDto.getVoteType().equals(VoteTypeEnum.UP_VOTE)) {
-                postEntity.setVoteCount(postEntity.getVoteCount() + 1);
-            } else if (voteRequestDto.getVoteType().equals(VoteTypeEnum.DOWN_VOTE)) {
-                postEntity.setVoteCount(postEntity.getVoteCount() - 1);
-            }
-            voteRepository.save(voteEntity);
-            postRepository.save(postEntity);
-            return voteEntity;
-        }
+        VoteEntity voteEntity;
 
+        if (previousVote.isPresent()) {
+            voteEntity = previousVote.get();
+            if (voteEntity.getVoteType().equals(voteRequestDto.getVoteType())) {
+                throw new AlreadyVotedException(voteRequestDto.getVoteType().name());
+            }
+
+            if (voteEntity.getVoteType().equals(VoteTypeEnum.LIKED)) {
+                postEntity.setLikeCount(postEntity.getLikeCount() - 1);
+                postEntity.setDislikeCount(postEntity.getDislikeCount() + 1);
+            } else if (voteEntity.getVoteType().equals(VoteTypeEnum.DISLIKED)) {
+                postEntity.setDislikeCount(postEntity.getDislikeCount() - 1);
+                postEntity.setLikeCount(postEntity.getLikeCount() + 1);
+            }
+            voteEntity.setVoteType(voteRequestDto.getVoteType());
+
+        } else {
+            voteEntity = entityDtoMapper.voteRequestDtoToVoteEntity(voteRequestDto);
+            if (voteRequestDto.getVoteType().equals(VoteTypeEnum.LIKED)) {
+                postEntity.setLikeCount(postEntity.getLikeCount() + 1);
+            } else if (voteRequestDto.getVoteType().equals(VoteTypeEnum.DISLIKED)) {
+                postEntity.setDislikeCount(postEntity.getDislikeCount() + 1);
+            }
+        }
+        voteRepository.save(voteEntity);
+        return voteEntity;
     }
+
 }

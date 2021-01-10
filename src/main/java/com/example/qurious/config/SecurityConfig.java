@@ -1,8 +1,9 @@
 package com.example.qurious.config;
 
 import com.example.qurious.security.JwtFilter;
+import com.example.qurious.security.MyJwtExceptionHandler;
 import com.example.qurious.service.MyUserServiceDetails;
-import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,14 +20,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * This class overrides the default security configurations
  */
-@Data
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final MyUserServiceDetails userServiceDetails;
-    private final JwtFilter jwtFilter;
-//    private final MyJwtExceptionHandler jwtExceptionHandler;
+    @Autowired
+    private MyUserServiceDetails userServiceDetails;
+    @Autowired
+    private JwtFilter jwtFilter;
+    @Autowired
+    private MyJwtExceptionHandler jwtExceptionHandler;
 
     /**
      * The method disables cors and cross site request forgery
@@ -46,8 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .anyRequest()
-                .authenticated();
-//                .and().exceptionHandling().authenticationEntryPoint(jwtExceptionHandler);
+                .authenticated()
+                .and().exceptionHandling().authenticationEntryPoint(jwtExceptionHandler);
 
         http.addFilterBefore(jwtFilter,
                 UsernamePasswordAuthenticationFilter.class);
