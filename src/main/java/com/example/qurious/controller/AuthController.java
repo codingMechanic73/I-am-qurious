@@ -5,6 +5,7 @@ import com.example.qurious.exception.CriticalException;
 import com.example.qurious.exception.UserAlreadyExistsException;
 import com.example.qurious.exception.UserNameAlreadyExistsException;
 import com.example.qurious.service.AuthService;
+import io.swagger.annotations.*;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.time.Instant;
 @Data
 @RestController
 @RequestMapping("api/v1/auth")
+@Api(description = "Endpoints for Sign Up, Sign In, Check if username exists")
 public class AuthController {
 
     private final AuthService authService;
@@ -31,8 +33,16 @@ public class AuthController {
      * @param signInRequestDto credentials from user
      * @return user details with valid jwt token
      */
+    @ApiOperation(value = "Sign the user In")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Signed In Successfully"),
+            @ApiResponse(code = 403, message = "You are not authenticated"),
+            @ApiResponse(code = 409, message = "The resource you were trying to add is already in use"),
+    })
     @PostMapping(value = "signin")
-    public ResponseEntity<SignInResponseDto> signIn(@RequestBody SignInRequestDto signInRequestDto) {
+    public ResponseEntity<SignInResponseDto> signIn(
+            @ApiParam(value = "Sign In Request", required = true, example = "sent")
+            @RequestBody SignInRequestDto signInRequestDto) {
         SignInResponseDto signInResponseDto = authService.signIn(signInRequestDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -48,6 +58,12 @@ public class AuthController {
      * @throws UserNameAlreadyExistsException if the userName is already in use
      * @throws CriticalException              Internal server error
      */
+    @ApiOperation(value = "SignUp the user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Signed Up Successfully"),
+            @ApiResponse(code = 409, message = "The resource you were trying to add is already in use"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @PostMapping(value = "/signup")
     public ResponseEntity<CustomResponseDto> signUp(@RequestBody SignUpRequestDto signUpRequestDto)
             throws UserNameAlreadyExistsException,
@@ -66,15 +82,20 @@ public class AuthController {
     /**
      * Checks if the userName is in user
      *
-     * @param userNameDto entered userName
+     * @param userNameRequestDto entered userName
      * @return if userName is available or not
      * @throws UserNameAlreadyExistsException if user already exists
      */
+    @ApiOperation(value = "Check if user exists")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "UserName is available"),
+            @ApiResponse(code = 409, message = "The resource you were trying to add is already in use"),
+    })
     @PostMapping(value = "/checkusernameexists")
-    public ResponseEntity<CustomResponseDto> checkUserNameExists(@RequestBody UserNameDto userNameDto)
+    public ResponseEntity<CustomResponseDto> checkUserNameExists(@RequestBody UserNameRequestDto userNameRequestDto)
             throws UserNameAlreadyExistsException {
-        if (authService.checkUserNameExists(userNameDto.getUserName())) {
-            throw new UserNameAlreadyExistsException(userNameDto.getUserName());
+        if (authService.checkUserNameExists(userNameRequestDto.getUserName())) {
+            throw new UserNameAlreadyExistsException(userNameRequestDto.getUserName());
         }
         CustomResponseDto customResponseDto = CustomResponseDto
                 .builder()

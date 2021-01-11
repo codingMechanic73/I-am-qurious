@@ -84,6 +84,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- spring swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
         <!--Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

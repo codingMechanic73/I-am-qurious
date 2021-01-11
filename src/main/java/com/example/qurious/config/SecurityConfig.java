@@ -6,12 +6,14 @@ import com.example.qurious.service.MyUserServiceDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -42,18 +44,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and()
-                .csrf().disable()
+        http
+                .cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/v1/auth/**")
-                .permitAll()
+                .antMatchers("/api/v1/auth/**",
+                        "/swagger-ui/index.html",
+                        "/swagger-ui/*.js",
+                        "/swagger-ui/*.css",
+                        "/swagger-ui/*.json",
+                        "/swagger-resources/configuration/**",
+                        "/swagger-resources",
+                        "/",
+                        "/v2/api-docs").permitAll()
                 .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/v1/topic").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/topic/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/post/").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/post/**").permitAll()
                 .anyRequest()
                 .authenticated()
-                .and().exceptionHandling().authenticationEntryPoint(jwtExceptionHandler);
-
-        http.addFilterBefore(jwtFilter,
-                UsernamePasswordAuthenticationFilter.class);
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtExceptionHandler, JwtFilter.class);
     }
 
     /**

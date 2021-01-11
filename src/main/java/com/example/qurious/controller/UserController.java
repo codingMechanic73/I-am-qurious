@@ -3,6 +3,10 @@ package com.example.qurious.controller;
 import com.example.qurious.dto.CustomResponseDto;
 import com.example.qurious.service.UserService;
 import com.example.qurious.util.Validator;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.Data;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -19,11 +23,17 @@ import java.time.Instant;
 @Data
 @RestController
 @RequestMapping("/api/v1/user")
+@Api(description = "Endpoints to change and retrieve user details")
 public class UserController {
 
     private final UserService userService;
     private final Validator validator;
 
+    @ApiOperation(value = "Change user profile")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Post successfully added"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+    })
     @PutMapping("/changeprofilepicture")
     public ResponseEntity<CustomResponseDto> changeDisplayPicture(@RequestParam("profilePicture") MultipartFile profilePicture) throws Exception {
 
@@ -52,6 +62,11 @@ public class UserController {
 
     }
 
+    @ApiOperation(value = "Get user profile")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Post successfully added"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+    })
     @GetMapping("/getprofile")
     public ResponseEntity<Resource> getProfile(HttpServletRequest request) throws Exception {
 
